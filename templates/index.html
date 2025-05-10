@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Augmentation Tool</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }
+    .options { margin-top: 20px; }
+    .manual-options { display: none; margin-top: 10px; }
+  </style>
+  <script>
+    function toggleManualOptions() {
+      const manual = document.getElementById('manual').checked;
+      document.getElementById('manual-options').style.display = manual ? 'block' : 'none';
+    }
+  </script>
+</head>
+<body>
+  <h1>🖼️ Image Augmentation Tool</h1>
+
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <label>Select an Image:</label><br>
+    <input type="file" name="image" required><br><br>
+
+    <label>Choose Augmentation Mode:</label><br>
+    <input type="radio" name="mode" value="auto" id="auto" checked onchange="toggleManualOptions()"> Auto<br>
+    <input type="radio" name="mode" value="manual" id="manual" onchange="toggleManualOptions()"> Manual<br>
+
+    <div id="manual-options" class="manual-options">
+      <p>Select Manual Augmentations:</p>
+      <input type="checkbox" name="augmentations" value="flip"> Flip<br>
+      <input type="checkbox" name="augmentations" value="rotate"> Rotate<br>
+      <input type="checkbox" name="augmentations" value="brightness"> Brightness<br>
+      <input type="checkbox" name="augmentations" value="noise"> Noise<br>
+      <input type="checkbox" name="augmentations" value="crop"> Crop<br>
+    </div>
+
+    <br><input type="submit" value="Generate Augmented Images">
+  </form>
+</body>
+</html>
