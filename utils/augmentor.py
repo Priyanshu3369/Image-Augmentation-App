@@ -4,7 +4,6 @@ import uuid
 import numpy as np
 import albumentations as A
 import random
-import matplotlib.pyplot as plt
 
 def save_augmented(image_array, output_folder, suffix):
     image_array = np.clip(image_array, 0, 255).astype(np.uint8)
@@ -17,6 +16,7 @@ def save_augmented(image_array, output_folder, suffix):
 def process_image(filepath, mode, manual_ops, output_folder, count=50):
     image = cv2.imread(filepath)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.resize(image, (256, 256))
     output_images = []
 
     if mode == 'auto':
@@ -32,51 +32,27 @@ def process_image(filepath, mode, manual_ops, output_folder, count=50):
         ])
         for i in range(count):
             augmented = transforms(image=image)['image']
-            augmented = np.clip(augmented, 0, 255).astype(np.uint8)
-
-            if i == 0:
-                plt.imshow(augmented)
-                plt.title("Preview: Clean Auto-Augmented")
-                plt.axis('off')
-                plt.show()
-
             path = save_augmented(augmented, output_folder, f"auto_{i}")
             output_images.append(path)
 
     elif mode == 'manual':
         per_aug_count = count // len(manual_ops) if manual_ops else 0
-
         for aug in manual_ops:
             for i in range(per_aug_count):
                 if aug == 'flip':
                     aug_img = cv2.flip(image, 1)
-
                 elif aug == 'rotate':
-                    rotate_aug = A.Rotate(limit=random.randint(15, 30), p=1.0)
-                    aug_img = rotate_aug(image=image)['image']
-
+                    aug_img = A.Rotate(limit=random.randint(15, 30), p=1.0)(image=image)['image']
                 elif aug == 'brightness':
-                    bright_aug = A.RandomBrightnessContrast(p=1.0)
-                    aug_img = bright_aug(image=image)['image']
-
+                    aug_img = A.RandomBrightnessContrast(p=1.0)(image=image)['image']
                 elif aug == 'crop':
-                    crop_aug = A.RandomCrop(
+                    aug_img = A.RandomCrop(
                         height=image.shape[0] - min(10, image.shape[0] // 10),
                         width=image.shape[1] - min(10, image.shape[1] // 10),
                         p=1.0
-                    )
-                    aug_img = crop_aug(image=image)['image']
-
+                    )(image=image)['image']
                 else:
                     continue
-
-                aug_img = np.clip(aug_img, 0, 255).astype(np.uint8)
-
-                if i == 0:
-                    plt.imshow(aug_img)
-                    plt.title(f"Preview: {aug} Manual")
-                    plt.axis('off')
-                    plt.show()
 
                 path = save_augmented(aug_img, output_folder, f"{aug}_{i}")
                 output_images.append(path)
