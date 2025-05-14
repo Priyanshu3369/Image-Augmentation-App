@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, send_file
 import os
+from flask import Flask, render_template, request, send_file
 from werkzeug.utils import secure_filename
 from utils.augmentor import process_image
 import zipfile
@@ -18,18 +18,6 @@ os.makedirs(app.config['ZIP_FOLDER'], exist_ok=True)
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/features.html')
-def features():
-    return render_template('features.html')
-
-@app.route('/about.html')
-def about():
-    return render_template('about.html')
-
-@app.route('/contact.html')
-def contact():
-    return render_template('contact.html')
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -64,4 +52,5 @@ def upload():
     return send_file(zip_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Use Render's PORT if available
+    app.run(debug=True, host='0.0.0.0', port=port)
