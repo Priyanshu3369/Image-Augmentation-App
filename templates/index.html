@@ -1,31 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Image Augmentation</title>
+  <meta charset="UTF-8" />
+  <title>Image Augmentor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-light: #f4f6f9;
+      --bg-dark: #1e1e2f;
+      --text-light: #333;
+      --text-dark: #f5f5f5;
+      --primary: #6c63ff;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #2c2c3e;
+      --accent-light: #e6e6ef;
+      --accent-dark: #34344e;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    nav {
+      background-color: var(--accent-light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 30px;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(24px);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      background-color: var(--card-bg-light);
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1.2rem;
+    }
+
+    input[type="file"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fdfdfd;
+      font-size: 1rem;
+    }
+
+    .checkbox-group {
+      margin-top: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem;
+    }
+
+    .checkbox-group input {
+      margin-right: 0.5rem;
+    }
+
+    input[type="submit"] {
+      margin-top: 2rem;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #5952d4;
+    }
+
+    .dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .dark-mode nav {
+      background-color: var(--accent-dark);
+    }
+
+    .dark-mode .container {
+      background-color: var(--card-bg-dark);
+    }
+
+    .dark-mode input,
+    .dark-mode select {
+      background-color: #444;
+      color: #eee;
+      border: 1px solid #666;
+    }
+
+    .dark-mode input[type="submit"] {
+      background-color: #8a85ff;
+    }
+  </style>
 </head>
 <body>
-    <h2>Upload Images</h2>
+  <nav>
+    <h1>Image Augmentor</h1>
+    <label class="toggle-switch">
+      <input type="checkbox" id="darkToggle" />
+      <span class="slider"></span>
+    </label>
+  </nav>
+
+  <div class="container">
+    <h2>Upload Image</h2>
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <label>Choose multiple images:</label><br>
-        <input type="file" name="images" multiple required><br><br>
+      <label>Choose an image:</label>
+      <input type="file" name="image" required />
 
-        <label>Mode:</label><br>
-        <select name="mode">
-            <option value="auto">Auto</option>
-            <option value="manual">Manual</option>
-        </select><br><br>
+      <label>Mode:</label>
+      <select name="mode">
+        <option value="auto">Auto</option>
+        <option value="manual">Manual</option>
+      </select>
 
-        <label>Manual Augmentations (select if mode is manual):</label><br>
-        <input type="checkbox" name="augmentations" value="flip"> Flip<br>
-        <input type="checkbox" name="augmentations" value="rotate"> Rotate<br>
-        <input type="checkbox" name="augmentations" value="brightness"> Brightness<br>
-        <input type="checkbox" name="augmentations" value="crop"> Crop<br><br>
+      <label>Manual Augmentations (select if mode is manual):</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="augmentations" value="flip" /> Flip</label>
+        <label><input type="checkbox" name="augmentations" value="rotate" /> Rotate</label>
+        <label><input type="checkbox" name="augmentations" value="brightness" /> Brightness</label>
+        <label><input type="checkbox" name="augmentations" value="crop" /> Crop</label>
+      </div>
 
-        <label>How many augmented images per input image?</label><br>
-        <input type="number" name="count" value="50" min="1"><br><br>
+      <label>How many augmented images?</label>
+      <input type="number" name="count" value="50" min="1" />
 
-        <input type="submit" value="Submit">
+      <input type="submit" value="Submit" />
     </form>
+  </div>
+
+  <script>
+    document.getElementById('darkToggle').addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
 </body>
 </html>

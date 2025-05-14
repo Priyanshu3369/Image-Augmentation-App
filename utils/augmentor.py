@@ -16,7 +16,6 @@ def save_augmented(image_array, output_folder, suffix):
 def process_image(filepath, mode, manual_ops, output_folder, count=50):
     image = cv2.imread(filepath)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, (256, 256))
     output_images = []
 
     if mode == 'auto':
@@ -37,6 +36,7 @@ def process_image(filepath, mode, manual_ops, output_folder, count=50):
 
     elif mode == 'manual':
         per_aug_count = count // len(manual_ops) if manual_ops else 0
+
         for aug in manual_ops:
             for i in range(per_aug_count):
                 if aug == 'flip':
